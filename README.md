@@ -99,7 +99,7 @@ Efficiency is typically measured as the ratio of input bits to output bits (wher
 | Base85 (z85) | 85 | 80% | Fixed Block (4 bytes -> 5 chars) | Uses subset avoiding \ ' ", \, , ; |
 | Base85 (Ascii85) | 85 | 80% | Fixed Block (4 bytes -> 5 chars) | Different character set than z85, includes punctuation |
 | Base91 (basE91) | 91 | ~81.3% | Variable Length | Efficient, uses A-Z, a-z, 0-9, and various symbols |
-| Base94 (Rust)* | 94 | ~82%? | Likely Fixed Block/Mapping* | Uses !-~. Specifics depend on crate implementation. |
+| Base94 (numeric)* | 94 | ~81,93% | Numeric using BigInt | Uses !-~. Specifics depend on crate implementation. |
 | Base94Max | 94 | ~81.3% - 87.5% | Adaptive Block (13/14 bits -> 2 chars) | Uses !-~. Efficiency varies slightly with input data. |
 
 *Note: Efficiency and algorithm type for "Base94 (Rust)" are estimates based on common approaches for crates like base94. The specific implementation might vary.
