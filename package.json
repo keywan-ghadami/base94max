@@ -29,6 +29,7 @@
   },
   "homepage": "https://github.com/keywan-ghadami/base94max#readme",
   "devDependencies": {
-    "mocha": "^10.0.0"
+    "mocha": "^10.0.0",
+    "random-bytes-seed": "^2.0.0"
   }
 }

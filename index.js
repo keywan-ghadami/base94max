@@ -156,32 +156,12 @@ function decode(inputString) {
          // A single leftover symbol must correctly encode the remaining bits.
          // Add its value to the buffer.
          bit_buf |= symbol_buffer << bit_count;
-         // Push the byte(s) this potentially completes. The C++ code pushes
-         // exactly one byte here and asserts the buffer becomes zero after shifting.
-         // Let's replicate that assertion logic.
-         if (bit_count < 8 && bit_buf === 0) {
-            // This implies the last symbol was pure padding for alignment, which shouldn't happen?
-            // Or the symbol completed bits already shifted out.
-             // Let's stick closer to the C++ FinishDecoding: It pushes one byte regardless.
-         }
 
-         // Replicating C++ FinishDecoding logic:
          bytes.push(bit_buf & 0xFF); // Push the byte represented by remaining bits + last symbol
          bit_buf >>>= 8;
-         // Assert remaining bits in buffer are zero (padding)
-         if (bit_buf !== 0) {
-             throw new Error("Invalid Base94Max padding (trailing bits).");
-         }
-    } else {
-       // No trailing symbol. Ensure remaining bits in buffer are zero padding.
-       if (bit_buf !== 0 || bit_count !== 0) {
-         // Note: bit_count could be non-zero but bit_buf zero if the last full block perfectly aligned.
-         // The C++ code doesn't explicitly check bit_count here, only bit_buf in the symbol_buffer case.
-         // If no symbol_buffer, bit_buf should be 0 if all bytes were processed.
-         if (bit_buf !== 0) {
-             throw new Error("Invalid Base94Max padding (incomplete group or trailing bits).");
-         }
-       }
+    }
+    if (bit_buf !== 0) {
+       throw new Error("Invalid Base94Max padding (bit_buf != 0)")
     }
 
     return new Uint8Array(bytes);
@@ -247,7 +227,7 @@ const Base94Max = {
             return uint8ArrayToString(uint8Array);
         } catch (e) {
             // Re-throw or handle appropriately
-            console.error("Decoded data could not be interpreted as UTF-8 text.", e);
+//            console.error("Decoded data could not be interpreted as UTF-8 text.", e);
             throw new Error("Decoded data is not valid UTF-8 text.");
         }
     }
