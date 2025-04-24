@@ -11,15 +11,14 @@ A JavaScript implementation of the Base94Max encoding scheme (adaptive 13/14-bit
 
 ```bash
 npm install base94max
+```
+## Usage
 
-Usage & API
 This module exports an object with methods for encoding and decoding. It supports both Uint8Array for binary data and convenience methods for UTF-8 strings.
+```
 Importing:
 // ES Module
 import Base94Max from 'base94max';
-
-// CommonJS (if needed, though package type is 'module')
-// const Base94Max = require('base94max');
 
 Basic Examples:
 // --- Binary Data (Uint8Array) ---
@@ -29,7 +28,7 @@ const binaryData = new Uint8Array([72, 101, 108, 108, 111]); // "Hello"
 try {
     const encoded = Base94Max.encode(binaryData);
     console.log(`Encoded "Hello": ${encoded}`);
-    // Example Output (actual output depends on exact algorithm state): Encoded "Hello": 3?n'>
+    // Encoded "Hello": E/6*rl!'>
 
     // Decode
     const decodedBytes = Base94Max.decode(encoded);
@@ -56,23 +55,10 @@ try {
 } catch (error) {
     console.error("An error occurred:", error.message);
 }
+```
 
-// --- Error Handling ---
-try {
-    // Decoding invalid characters
-    Base94Max.decode("This is invalid");
-} catch (error) {
-    console.error(error.message); // Example: Invalid character in Base94Max string...
-}
+### API Methods
 
-try {
-    // Decoding invalid structure / padding
-    Base94Max.decode("ValidStart" + "%"); // Assuming '%' is valid but structure is wrong
-} catch (error) {
-    console.error(error.message); // Example: Invalid Base94Max padding...
-}
-
-API Methods:
  * Base94Max.encode(binaryData: Uint8Array): string
    * Encodes a Uint8Array into a Base94Max string.
    * Throws an error if the input is not a Buffer or Uint8Array.
@@ -85,18 +71,26 @@ API Methods:
  * Base94Max.decodeText(base94MaxString: string): string
    * Convenience method. Decodes a Base94Max string back into a UTF-8 string.
    * Throws an error if decoding fails or if the resulting bytes are not valid UTF-8.
-Algorithm
-Source
+
+### Algorithm
+
+#### Source
+
 This implementation is based on the Base94 encoding algorithm found in Google's Crashpad crash reporting system. It uses an adaptive bit-packing scheme to maximize data density using 94 printable ASCII characters.
-You can find the original C++ source code in the Crashpad repository (Note: Requires understanding the stream context). (Self-correction: Using official Chromium link instead of potentially ephemeral GitLab mirror)
-Comparison with Other Encodings
-Character Set Considerations
+You can find the original C++ source code in the Crashpad repository
+
+#### Comparison with Other Encodings
+
+##### Character Set Considerations
+
 Binary-to-text encodings map binary data onto a chosen set of characters. The choice of character set impacts usability and potential density:
- * Printable ASCII: Most encodings (Base64, Base85, Base91, Base94Max) restrict themselves to standard printable ASCII characters to ensure easy handling in text-based formats, emails, and source code.
+ * Printable ASCII: printable ASCII characters ensure easy handling in text-based formats, emails, and source code.
  * Space Character (     ): While printable, the space character is often avoided in encodings because it can be sensitive to trimming, line wrapping, or indentation changes in different environments. Base94Max uses characters ! (ASCII 33) through ~ (ASCII 126), avoiding the space character.
  * Control Characters: ASCII control characters (0-31 and 127) are generally unsuitable for text encoding as they are non-printable and can cause issues with copy-paste, editors, terminals, and data transmission. Encodings like Base122 attempt to use more characters for higher theoretical density but may include characters that cause practical handling problems. Base94Max strictly avoids these.
 It's important to note that simply having more characters does not automatically guarantee higher efficiency. The algorithm used to group input bits and map them to output characters plays a crucial role in the final space efficiency.
-Efficiency Overview
+
+##### Efficiency Overview
+
 Efficiency is typically measured as the ratio of input bits to output bits (where output bits are usually 8 per character). Higher percentages are better.
 | Encoding | Character Set Size | Efficiency (Approx.) | Algorithm Type | Notes |
 |---|---|---|---|---|
