@@ -42,6 +42,7 @@ try {
 
 # Example usage for unicode text
 ```
+import Base94Max from 'base94max';
 
 // --- Text Data (UTF-8 Strings) ---
 const text = "Base94Max is efficient! 😊";
