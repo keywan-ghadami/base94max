@@ -27,6 +27,11 @@
   "bugs": {
     "url": "https://github.com/keywan-ghadami/base94max/issues"
   },
+  "files": [
+    "index.js",
+    "README.md",
+    "LICENSE"
+  ],
   "homepage": "https://github.com/keywan-ghadami/base94max#readme",
   "devDependencies": {
     "mocha": "^10.0.0",
