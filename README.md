@@ -16,12 +16,11 @@ npm install base94max
 ## Usage
 
 This module exports an object with methods for encoding and decoding. It supports both Uint8Array for binary data and convenience methods for UTF-8 strings.
+
+# Example usage for binary data
 ```
-Importing:
-// ES Module
 import Base94Max from 'base94max';
 
-Basic Examples:
 // --- Binary Data (Uint8Array) ---
 const binaryData = new Uint8Array([72, 101, 108, 108, 111]); // "Hello"
 
@@ -39,6 +38,10 @@ try {
 } catch (error) {
     console.error("An error occurred:", error.message);
 }
+```
+
+# Example usage for unicode text
+```
 
 // --- Text Data (UTF-8 Strings) ---
 const text = "Base94Max is efficient! 😊";
@@ -60,16 +63,22 @@ try {
 
 ### API Methods
 
- * Base94Max.encode(binaryData: Uint8Array): string
+#### Base94Max.encode(binaryData: Uint8Array): string
+
    * Encodes a Uint8Array into a Base94Max string.
    * Throws an error if the input is not a Buffer or Uint8Array.
- * Base94Max.decode(base94MaxString: string): Uint8Array
+
+#### Base94Max.decode(base94MaxString: string): Uint8Array
+
    * Decodes a Base94Max string back into a Uint8Array.
    * Throws an error if the input is not a string, contains invalid characters, or has invalid padding/structure.
- * Base94Max.encodeText(textString: string): string
+
+#### Base94Max.encodeText(textString: string): string
+
    * Convenience method. Encodes a UTF-8 string into a Base94Max string.
    * Throws an error if the input is not a string.
- * Base94Max.decodeText(base94MaxString: string): string
+
+#### Base94Max.decodeText(base94MaxString: string): string
    * Convenience method. Decodes a Base94Max string back into a UTF-8 string.
    * Throws an error if decoding fails or if the resulting bytes are not valid UTF-8.
 
@@ -99,17 +108,19 @@ Efficiency is typically measured as the ratio of input bits to output bits (wher
 | Base85 (z85) | 85 | 80% | Fixed Block (4 bytes -> 5 chars) | Uses subset avoiding \ ' ", \, , ; |
 | Base85 (Ascii85) | 85 | 80% | Fixed Block (4 bytes -> 5 chars) | Different character set than z85, includes punctuation |
 | Base91 (basE91) | 91 | ~81.3% | Variable Length | Efficient, uses A-Z, a-z, 0-9, and various symbols |
-| Base94 (numeric)* | 94 | ~81,93% | Numeric using BigInt | Uses !-~. Specifics depend on crate implementation. |
+| Base94 (numeric) | 94 | ~81,93% | Numeric using BigInt | Uses !-~. Specifics depend on crate implementation. |
 | Base94Max | 94 | ~81.3% - 87.5% | Adaptive Block (13/14 bits -> 2 chars) | Uses !-~. Efficiency varies slightly with input data. |
 
-*Note: Efficiency and algorithm type for "Base94 (Rust)" are estimates based on common approaches for crates like base94. The specific implementation might vary.
 Base94Max achieves high efficiency by adaptively choosing between encoding 13 or 14 bits into two output characters, depending on the input data values.
-Tests
+
+## Tests
+
 To run the test suite:
  * Ensure you have Node.js installed.
  * Clone the repository.
  * Install development dependencies: npm install
  * Run the tests: npm test
+
 The tests use Mocha and Node.js' built-in assert module.
 
 ## License
