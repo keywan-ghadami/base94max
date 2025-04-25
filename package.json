@@ -7,6 +7,9 @@
   "scripts": {
     "test": "mocha"
   },
+  "bin": {
+    "base94" : "bin/base94.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/keywan-ghadami/base94max.git"
@@ -39,5 +42,8 @@
     "globals": "^16.0.0",
     "mocha": "^10.0.0",
     "random-bytes-seed": "^2.0.0"
+  },
+  "dependencies": {
+    "yargs": "^17.7.2"
   }
 }
