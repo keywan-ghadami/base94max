@@ -124,6 +124,22 @@ describe('Base94Max', () => {
                 }
             });
         });
+
+        testCases.forEach(tc => {
+            it(`json should correctly preserve data for: ${tc.name}`, () => {
+                if (tc.data !== undefined) {
+                    const encoded = Base94Max.encode(tc.data,Base94Max.JSON_DELETE);
+                    const decoded = Base94Max.decode(encoded,Base94Max.JSON_DELETE);
+                    assertArraysEqual(decoded, tc.data, `Binary round trip failed for "${tc.name}"`);
+                }
+                if (tc.text !== undefined) {
+                    const encodedText = Base94Max.encodeText(tc.text,Base94Max.JSON_DELETE);
+                    //console.log(`Test: ${tc.name}\nText: ${tc.text}\nEncoded: ${encodedText}`); // Debugging
+                    const decodedText = Base94Max.decodeText(encodedText,Base94Max.JSON_DELETE);
+                    assert.strictEqual(decodedText, tc.text, `Text round trip failed for "${tc.name}"`);
+                }
+            });
+        });
     });
 
      // --- Test 3: Fehlererkennung beim Decodieren ---
