@@ -1,6 +1,6 @@
 {
   "name": "base94max",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "JavaScript implementation of the Base94Max encoding scheme (adaptive 13/14-bit) for encoding and decoding binary data.",
   "main": "index.js",
   "type": "module",
