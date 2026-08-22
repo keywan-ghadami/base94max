@@ -6,6 +6,24 @@ class Base94Max {
     static #INVALID_VALUE = 94; // Marker for invalid decoded char value
     static #K_MAX_VALUE_14BIT_ENCODING_THRESHOLD = 643; // (94*94-1) & 0x1FFF
 
+    // Whitespace character codes. While decoding, a whitespace character that is
+    // not part of the active alphabet is ignored rather than rejected, so that
+    // line-wrapped or newline-terminated input decodes without preprocessing.
+    static #WHITESPACE = new Set([0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x20]);
+
+    static #deprecationsEmitted = new Set();
+
+    /** @private */
+    static #emitDeprecation(code, message) {
+        if (Base94Max.#deprecationsEmitted.has(code)) return;
+        Base94Max.#deprecationsEmitted.add(code);
+        if (typeof process !== 'undefined' && typeof process.emitWarning === 'function') {
+            process.emitWarning(message, 'DeprecationWarning', code);
+        } else {
+            console.warn(`DeprecationWarning [${code}]: ${message}`);
+        }
+    }
+
     // --- Private Static Encode Maps (Hardcoded) ---
 
     /** @type {readonly string[]} */
@@ -78,22 +96,38 @@ class Base94Max {
         decodeMap: Base94Max.#PRINTABLE_DECODE_MAP
     });
 
-    /**
-     * Predefined variant replacing problematic JSON characters '"' and '\'
-     * with Space and DEL. Use for safer embedding in JSON strings.
-     * Contains `{ encodeMap: readonly string[], decodeMap: readonly number[] }`.
-     * @type {Readonly<{encodeMap: readonly string[], decodeMap: readonly number[]}>}
-     */
-    static JSON_DELETE = Object.freeze({
+    /** @private */
+    static #JSON_DELETE_VARIANT = Object.freeze({
         encodeMap: Base94Max.#JSON_DELETE_ENCODE_MAP,
         decodeMap: Base94Max.#JSON_DELETE_DECODE_MAP
     });
 
-
-    // --- Private Static Helper Functions (Encoding/Decoding Char - Unchanged) ---
-    static #decodeCharValue(char, decodeMap) {
-        const charCode = char.charCodeAt(0);
-        return decodeMap[charCode];
+    /**
+     * Variant replacing '"' and '\' with Space and DEL.
+     *
+     * @deprecated Since 0.2.1, removed in 0.3.0. The substitution makes the output
+     * fragile in exactly the way this encoding is meant to resist: roughly 4.6% of
+     * payloads end in a space, so any whitespace normalisation in the transport chain
+     * (a form parser, a CHAR column, a log pipeline) renders them undecodable, and
+     * about 45% contain DEL, which is invisible in terminals, diffs and editors. It
+     * also diverges from upstream Crashpad, which encodes with every printable
+     * character except space. For structured text containers use Base85N
+     * (https://base85n.ghadami.de/) instead.
+     *
+     * To keep reading data already encoded with this variant after 0.3.0, pass the
+     * alphabet explicitly; see CHANGELOG.md.
+     *
+     * @type {Readonly<{encodeMap: readonly string[], decodeMap: readonly number[]}>}
+     */
+    static get JSON_DELETE() {
+        Base94Max.#emitDeprecation(
+            'DEP_BASE94MAX_JSON_DELETE',
+            'Base94Max.JSON_DELETE is deprecated and will be removed in 0.3.0: its ' +
+            'alphabet contains Space and DEL, which do not survive whitespace ' +
+            'normalisation. Use the default PRINTABLE variant, or Base85N for ' +
+            'structured text containers. See CHANGELOG.md to keep reading existing data.'
+        );
+        return Base94Max.#JSON_DELETE_VARIANT;
     }
 
 
@@ -128,7 +162,6 @@ class Base94Max {
 
     /** @private */
     static #encodeInternal(uint8Array, encodeMap) {
-        // (Previous core logic, ensuring it uses the passed encodeMap via #encodeByteValue)
         let bit_buf = 0;
         let bit_count = 0;
         let result = "";
@@ -166,7 +199,6 @@ class Base94Max {
 
     /** @private */
     static #decodeInternal(inputString, decodeMap) {
-        // (Previous core logic, ensuring it uses the passed decodeMap via #decodeCharValue)
         let bit_buf = 0;
         let bit_count = 0;
         const bytes = [];
@@ -175,10 +207,25 @@ class Base94Max {
         const invalidValue = Base94Max.#INVALID_VALUE;
 
         for (let i = 0; i < inputString.length; i++) {
-            const charValue = Base94Max.#decodeCharValue(inputString[i], decodeMap);
+            const charCode = inputString.charCodeAt(i);
+            // decodeMap only covers ASCII. Anything above must be rejected explicitly:
+            // reading past the end yields undefined, which is not equal to the invalid
+            // marker, so an unchecked lookup would let the character through and
+            // silently produce wrong bytes.
+            const charValue = charCode < 128 ? decodeMap[charCode] : invalidValue;
 
-            if (charValue === invalidValue) {
-                throw new Error(`Invalid character in Base94Max string at position ${i}: '${inputString[i]}'`);
+            if (charValue === invalidValue || charValue === undefined || charValue === null) {
+                // Whitespace that is not part of this alphabet carries no data, so it
+                // is ignored. This lets line-wrapped and newline-terminated input
+                // decode as-is. Alphabets that use a whitespace character keep it as
+                // data, because its lookup succeeds and never reaches this branch.
+                if (Base94Max.#WHITESPACE.has(charCode)) {
+                    continue;
+                }
+                const shown = charCode < 0x20 || charCode === 0x7f
+                    ? `\\x${charCode.toString(16).padStart(2, '0')}`
+                    : inputString[i];
+                throw new Error(`Invalid character in Base94Max string at position ${i}: '${shown}'`);
             }
 
             if (symbol_buffer === -1) {
@@ -283,5 +330,11 @@ class Base94Max {
 }
 
 // --- Export ---
-export default Base94Max;
+// The accessor above replaces a static data property. Restore enumerability so
+// that Object.keys(Base94Max) still lists it, as it did in 0.2.0.
+Object.defineProperty(Base94Max, 'JSON_DELETE', {
+    ...Object.getOwnPropertyDescriptor(Base94Max, 'JSON_DELETE'),
+    enumerable: true
+});
 
+export default Base94Max;
