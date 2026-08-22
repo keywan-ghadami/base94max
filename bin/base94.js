@@ -19,7 +19,7 @@ try {
     })
     .option('mode', {
       alias: 'm',
-      describe: 'Encoding variant (character set)',
+      describe: 'Encoding variant (character set). json-delete is deprecated and will be removed in 0.3.0',
       choices: ['printable', 'json-delete'],
       default: 'printable',
       type: 'string'
@@ -97,4 +97,3 @@ async function run() {
 
 // --- Start the process ---
 run();
-
