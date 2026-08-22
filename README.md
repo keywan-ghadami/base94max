@@ -1,4 +1,4 @@
-*This README was generated with assistance from Google AI.*
+*This README was generated with assistance from AI.*
 
 # Base94Max
 
@@ -72,6 +72,8 @@ try {
 #### Base94Max.decode(base94MaxString: string): Uint8Array
 
    * Decodes a Base94Max string back into a Uint8Array.
+   * Whitespace in the input is ignored, so newline-terminated and line-wrapped
+     strings decode as-is. (Whitespace is never part of the output alphabet.)
    * Throws an error if the input is not a string, contains invalid characters, or has invalid padding/structure.
 
 #### Base94Max.encodeText(textString: string): string
@@ -127,4 +129,3 @@ The tests use Mocha and Node.js' built-in assert module.
 ## License
 
 This project is licensed under the Apache License 2.0. See the LICENSE file for details.
-
