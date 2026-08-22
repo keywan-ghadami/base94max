@@ -1,6 +1,6 @@
 {
   "name": "base94max",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "JavaScript implementation of the Base94Max encoding scheme (adaptive 13/14-bit) for encoding and decoding binary data.",
   "main": "index.js",
   "type": "module",
@@ -8,7 +8,7 @@
     "test": "mocha"
   },
   "bin": {
-    "base94" : "bin/base94.js"
+    "base94": "bin/base94.js"
   },
   "repository": {
     "type": "git",
@@ -32,7 +32,9 @@
   },
   "files": [
     "index.js",
+    "bin/",
     "README.md",
+    "CHANGELOG.md",
     "LICENSE"
   ],
   "homepage": "https://github.com/keywan-ghadami/base94max#readme",
@@ -41,7 +43,7 @@
     "eslint": "^9.25.1",
     "globals": "^16.0.0",
     "mocha": "^10.0.0",
-    "random-bytes-seed": "^2.0.0"
+    "random-bytes-seed": "^1.0.0"
   },
   "dependencies": {
     "yargs": "^17.7.2"
