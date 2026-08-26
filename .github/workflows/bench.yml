@@ -53,7 +53,7 @@ jobs:
         with: { repository: keywan-ghadami/base91z, path: base91z }
 
       - name: The benchmark
-        uses: keywan-ghadami/binary2textbench@claude/centralized-encoding-benchmark-z7sf15
+        uses: keywan-ghadami/binary2textbench@main
         with:
           codec-name: base94max
           codec-path: ${{ github.workspace }}/head
