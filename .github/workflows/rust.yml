@@ -1,0 +1,44 @@
+# The Rust port of index.js. It exists so that Base94Max can be measured in the
+# same process as the other encodings it is compared against, in
+# binary2textbench; the vector test is what keeps it a port rather than a fork.
+name: Rust
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rust-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  rust:
+    name: Port and vectors
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    defaults:
+      run:
+        working-directory: rust
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+      - run: cargo test --release
+      - name: Warnings are errors
+        run: cargo clippy --all-targets --release -- -D warnings
+
+      # The vectors are generated, not authored. Regenerating them here and
+      # failing on a diff means index.js and the port cannot drift apart
+      # without someone being told.
+      - name: The vectors still match index.js
+        working-directory: .
+        run: |
+          node tools/gen-testvectors.js
+          git diff --exit-code testvectors/base94max.json

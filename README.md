@@ -532,3 +532,30 @@ Apache License 2.0. See [LICENSE](LICENSE).
 
 *Parts of this README were drafted with AI assistance and then verified against
 measurements.*
+
+## Rust
+
+`rust/` holds a port of `index.js`, published as the crate `base94max`. It
+exists so that Base94Max can be measured in one process alongside the
+encodings it is compared against, in
+[binary2textbench](https://github.com/keywan-ghadami/binary2textbench) —
+comparing throughput across a language boundary would measure the languages.
+
+```rust
+let encoded = base94max::encode(b"Hello");
+assert_eq!(base94max::decode(&encoded).unwrap(), b"Hello");
+```
+
+It implements the `PRINTABLE` alphabet only; the deprecated `JSON_DELETE`
+variant is not ported.
+
+What keeps it a port rather than a second implementation is
+`testvectors/base94max.json`: `tools/gen-testvectors.js` writes it from
+`index.js`, and the Rust test suite reads the same file and compares character
+for character. CI regenerates the file and fails on a diff, so the two cannot
+drift apart quietly.
+
+```sh
+node tools/gen-testvectors.js     # after any change to index.js
+cd rust && cargo test --release
+```
