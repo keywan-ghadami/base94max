@@ -1,0 +1,28 @@
+[package]
+name = "base94max"
+# Tracks the JavaScript implementation in the repository root, which is what
+# defines the encoding: this crate is a port, not a second design.
+version = "0.2.1"
+edition = "2021"
+# 1.73 is where `u64::div_ceil` stabilised, which the size hint uses.
+rust-version = "1.73"
+description = "Base94Max: adaptive 13/14-bit binary-to-text encoding over the 94 printable ASCII characters."
+license = "Apache-2.0"
+authors = ["Keywan Ghadami"]
+repository = "https://github.com/keywan-ghadami/base94max"
+keywords = ["base94", "base64", "encoding", "binary-to-text"]
+categories = ["encoding", "text-processing"]
+include = ["src/**/*.rs", "tests/*.rs", "testvectors/*.json", "README.md", "LICENSE"]
+
+[lib]
+name = "base94max"
+path = "src/lib.rs"
+
+[dev-dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1

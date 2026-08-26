@@ -28,5 +28,7 @@ jobs:
         cache: 'npm'
     - run: npm ci
     - run: npm run build --if-present
-    - run: npx eslint index.js
+    # tools/ generates the test vectors the Rust port is checked against, so
+    # it is as much a part of this repository as index.js is.
+    - run: npx eslint index.js tools/
     - run: npm test
