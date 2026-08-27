@@ -50,11 +50,17 @@ jobs:
           ref: ${{ github.event.pull_request.base.sha }}
           path: base
 
-      - name: The other codecs
+      - name: Check out base85n
         uses: actions/checkout@v4
-        with: { repository: keywan-ghadami/base85n, path: base85n }
-      - uses: actions/checkout@v4
-        with: { repository: keywan-ghadami/base91z, path: base91z }
+        with:
+          repository: keywan-ghadami/base85n
+          path: base85n
+
+      - name: Check out base91z
+        uses: actions/checkout@v4
+        with:
+          repository: keywan-ghadami/base91z
+          path: base91z
 
       - name: The benchmark
         uses: keywan-ghadami/binary2textbench@main
@@ -68,7 +74,8 @@ jobs:
           rounds: ${{ inputs.rounds || '7' }}
           title: Base94Max on this pull request
 
-      - uses: actions/upload-artifact@v4
+      - name: Keep the results and the page
+        uses: actions/upload-artifact@v4
         with:
           name: benchmark
           path: b2t-site/
